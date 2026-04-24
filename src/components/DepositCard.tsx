@@ -2,76 +2,56 @@ import type { Deposit } from '../types'
 import {
   formatCurrency,
   formatPercent,
-  getStatusLabel,
-  getStatusMessage,
+  formatShortDate,
   getStatusTone,
 } from '../lib/deposits'
 
 type DepositCardProps = {
   deposit: Deposit
-  onEdit: (deposit: Deposit) => void
-  onDelete: (deposit: Deposit) => void
+  onOpen: (deposit: Deposit) => void
 }
 
-const labelMap = {
-  bankName: 'Банк',
-  ratePercent: 'Процент',
-  openDate: 'Дата открытия',
-  closeDate: 'Дата закрытия',
-  amountRub: 'Сумма вклада',
-  expectedIncomeRub: 'Ожидаемый доход',
-}
-
-export function DepositCard({ deposit, onEdit, onDelete }: DepositCardProps) {
+export function DepositCard({ deposit, onOpen }: DepositCardProps) {
   const statusTone = getStatusTone(deposit.status)
 
   return (
-    <article className={`deposit-card ${statusTone}`}>
+    <button
+      type="button"
+      className={`deposit-card ${statusTone}`}
+      onClick={() => onOpen(deposit)}
+      aria-label={`Открыть вклад ${deposit.bankName}`}
+    >
       <div className="deposit-card__topline">
-        <span className="deposit-card__badge">{getStatusLabel(deposit.status)}</span>
-        <span className="deposit-card__deadline">{getStatusMessage(deposit.closeDate)}</span>
+        <h3>{deposit.bankName}</h3>
+        <span className={`deposit-card__dot ${statusTone}`} aria-hidden="true" />
       </div>
 
-      <div className="deposit-card__header">
-        <h3>{deposit.bankName}</h3>
-        <p>{formatPercent(deposit.ratePercent)}% годовых</p>
+      <div className="deposit-card__amount">
+        <span>Сумма вклада</span>
+        <strong>{formatCurrency(deposit.amountRub)}</strong>
       </div>
 
       <dl className="deposit-card__details">
         <div>
-          <dt>{labelMap.bankName}</dt>
-          <dd>{deposit.bankName}</dd>
-        </div>
-        <div>
-          <dt>{labelMap.ratePercent}</dt>
+          <dt>Ставка</dt>
           <dd>{formatPercent(deposit.ratePercent)}%</dd>
         </div>
         <div>
-          <dt>{labelMap.openDate}</dt>
-          <dd>{deposit.openDate}</dd>
-        </div>
-        <div>
-          <dt>{labelMap.closeDate}</dt>
-          <dd>{deposit.closeDate}</dd>
-        </div>
-        <div>
-          <dt>{labelMap.amountRub}</dt>
-          <dd>{formatCurrency(deposit.amountRub)}</dd>
-        </div>
-        <div>
-          <dt>{labelMap.expectedIncomeRub}</dt>
+          <dt>Ожидаемый доход</dt>
           <dd>{formatCurrency(deposit.expectedIncomeRub)}</dd>
         </div>
       </dl>
 
-      <div className="deposit-card__actions">
-        <button type="button" className="secondary-button" onClick={() => onEdit(deposit)}>
-          Редактировать
-        </button>
-        <button type="button" className="ghost-button" onClick={() => onDelete(deposit)}>
-          Удалить
-        </button>
-      </div>
-    </article>
+      <dl className="deposit-card__dates">
+        <div>
+          <dt>Открыт</dt>
+          <dd>{formatShortDate(deposit.openDate)}</dd>
+        </div>
+        <div>
+          <dt>Закрытие</dt>
+          <dd>{formatShortDate(deposit.closeDate)}</dd>
+        </div>
+      </dl>
+    </button>
   )
 }

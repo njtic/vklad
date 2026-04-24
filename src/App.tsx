@@ -1,11 +1,14 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
+import { AddDepositTile } from './components/AddDepositTile'
+import { ClosingTimeline } from './components/ClosingTimeline'
 import { DepositCard } from './components/DepositCard'
 import { DepositModal } from './components/DepositModal'
 import { SummaryPanel } from './components/SummaryPanel'
 import {
   buildSummary,
   createDepositFromDraft,
+  getClosestClosingDeposits,
   getDepositStatus,
   hydrateDeposit,
   makeDraftFromDeposit,
@@ -39,6 +42,7 @@ function App() {
   const archivedDeposits = sortArchivedDeposits(
     normalizedDeposits.filter((deposit) => deposit.status === 'closed'),
   )
+  const closestClosingDeposits = getClosestClosingDeposits(activeDeposits)
   const summary = buildSummary(activeDeposits)
 
   function openCreateModal() {
@@ -110,67 +114,53 @@ function App() {
     }
 
     setDeposits((current) => current.filter((item) => item.id !== deposit.id))
+    closeModal()
   }
 
   return (
     <div className="app-shell">
-      <div className="app-shell__glow app-shell__glow--top" />
-      <div className="app-shell__glow app-shell__glow--bottom" />
-
       <main className="dashboard">
-        <section className="hero">
-          <div>
-            <p className="hero__eyebrow">Локальный трекер вкладов</p>
-            <h1>Все вклады на одном экране, с акцентом на сроки закрытия.</h1>
-            <p className="hero__body">
-              Карточки автоматически подсвечивают вклады, которым скоро нужен следующий шаг.
-            </p>
-          </div>
-
-          <button type="button" className="primary-button" onClick={openCreateModal}>
+        <header className="page-header">
+          <h1>Календарь вкладов</h1>
+          <button type="button" className="outline-button" onClick={openCreateModal} aria-label="Добавить вклад">
+            <span aria-hidden="true">+</span>
             Добавить вклад
           </button>
-        </section>
+        </header>
 
         <SummaryPanel {...summary} />
 
-        <section className="section-header">
-          <div>
-            <p className="section-header__eyebrow">Активный портфель</p>
+        <ClosingTimeline deposits={closestClosingDeposits} />
+
+        <section className="content-card">
+          <div className="section-header">
             <h2>Активные вклады</h2>
+            <div className="legend" aria-label="Легенда сроков">
+              <span><i className="legend__dot status-urgent" />До 30 дней</span>
+              <span><i className="legend__dot status-warning" />30–90 дней</span>
+              <span><i className="legend__dot status-safe" />90+ дней</span>
+            </div>
           </div>
-          <p className="section-header__meta">
-            Сортировка по ближайшей дате закрытия, чтобы срочные вклады были первыми.
-          </p>
+
+          {activeDeposits.length ? (
+            <section className="deposit-grid" data-testid="active-grid" aria-label="Активные вклады">
+              {activeDeposits.map((deposit) => (
+                <DepositCard key={deposit.id} deposit={deposit} onOpen={openEditModal} />
+              ))}
+              <AddDepositTile onClick={openCreateModal} />
+            </section>
+          ) : (
+            <section className="deposit-grid deposit-grid--empty" data-testid="active-grid">
+              <AddDepositTile onClick={openCreateModal} />
+            </section>
+          )}
         </section>
 
-        {activeDeposits.length ? (
-          <section className="deposit-grid" data-testid="active-grid" aria-label="Активные вклады">
-            {activeDeposits.map((deposit) => (
-              <DepositCard
-                key={deposit.id}
-                deposit={deposit}
-                onEdit={openEditModal}
-                onDelete={handleDelete}
-              />
-            ))}
-          </section>
-        ) : (
-          <section className="empty-state">
-            <h2>Активных вкладов пока нет</h2>
-            <p>Добавьте первый вклад, и он сразу появится в обзорной сетке.</p>
-          </section>
-        )}
-
-        <section className="archive-section">
-          <button
-            type="button"
-            className="archive-toggle"
-            onClick={() => setArchiveOpen((current) => !current)}
-          >
-            {archiveOpen ? 'Скрыть архив' : 'Показать архив'} ({archivedDeposits.length})
+        <section className="archive-section content-card">
+          <button type="button" className="archive-toggle" onClick={() => setArchiveOpen((current) => !current)}>
+            <span>Архивные вклады</span>
+            <span className={`archive-toggle__chevron ${archiveOpen ? 'archive-toggle__chevron--open' : ''}`}>⌄</span>
           </button>
-
           {archiveOpen ? (
             archivedDeposits.length ? (
               <div className="archive-grid" aria-label="Архив вкладов">
@@ -178,8 +168,7 @@ function App() {
                   <DepositCard
                     key={deposit.id}
                     deposit={{ ...deposit, status: getDepositStatus(deposit.closeDate) }}
-                    onEdit={openEditModal}
-                    onDelete={handleDelete}
+                    onOpen={openEditModal}
                   />
                 ))}
               </div>
@@ -188,6 +177,16 @@ function App() {
             )
           ) : null}
         </section>
+
+        <footer className="privacy-note">
+          <span className="privacy-note__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3l7 3v5c0 5-3.2 8.8-7 10-3.8-1.2-7-5-7-10V6z" fill="none" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M9.5 12l1.6 1.6L14.8 10" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <p>Данные хранятся только на вашем устройстве и никуда не передаются.</p>
+        </footer>
       </main>
 
       {modalState ? (
@@ -198,6 +197,7 @@ function App() {
           onChange={updateDraft}
           onClose={closeModal}
           onSubmit={handleSubmit}
+          onDelete={modalState.mode === 'edit' ? () => handleDelete(modalState.deposit) : undefined}
         />
       ) : null}
     </div>

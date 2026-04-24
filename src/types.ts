@@ -1,4 +1,4 @@
-export type DepositStatus = 'normal' | 'warning' | 'critical' | 'closed'
+export type DepositStatus = 'urgent' | 'warning' | 'safe' | 'closed'
 
 export type Deposit = {
   id: string

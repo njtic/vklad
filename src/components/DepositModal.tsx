@@ -9,6 +9,7 @@ type DepositModalProps = {
   onChange: (field: keyof DepositDraft, value: string) => void
   onClose: () => void
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  onDelete?: () => void
 }
 
 export function DepositModal({
@@ -18,6 +19,7 @@ export function DepositModal({
   onChange,
   onClose,
   onSubmit,
+  onDelete,
 }: DepositModalProps) {
   const expectedIncome =
     draft.amountRub && draft.ratePercent && draft.openDate && draft.closeDate
@@ -118,12 +120,21 @@ export function DepositModal({
           {error ? <p className="form-error">{error}</p> : null}
 
           <div className="modal__actions">
-            <button type="button" className="ghost-button" onClick={onClose}>
-              Отмена
-            </button>
-            <button type="submit" className="primary-button">
-              {mode === 'create' ? 'Сохранить вклад' : 'Сохранить изменения'}
-            </button>
+            <div className="modal__actions-group">
+              {mode === 'edit' && onDelete ? (
+                <button type="button" className="danger-button" onClick={onDelete}>
+                  Удалить вклад
+                </button>
+              ) : null}
+            </div>
+            <div className="modal__actions-group">
+              <button type="button" className="ghost-button" onClick={onClose}>
+                Отмена
+              </button>
+              <button type="submit" className="primary-button">
+                {mode === 'create' ? 'Сохранить вклад' : 'Сохранить изменения'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

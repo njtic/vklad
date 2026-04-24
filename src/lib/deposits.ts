@@ -1,6 +1,12 @@
 import type { Deposit, DepositDraft, DepositStatus } from '../types'
 
 const DAY_MS = 86_400_000
+const shortDateFormatter = new Intl.DateTimeFormat('ru-RU')
+const longDateFormatter = new Intl.DateTimeFormat('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
 
 function startOfDay(input: string | Date) {
   const date = typeof input === 'string' ? new Date(`${input}T00:00:00`) : input
@@ -46,15 +52,15 @@ export function getDepositStatus(closeDate: string, today = new Date()): Deposit
     return 'closed'
   }
 
-  if (daysUntilClose <= 7) {
-    return 'critical'
+  if (daysUntilClose <= 30) {
+    return 'urgent'
   }
 
-  if (daysUntilClose <= 30) {
+  if (daysUntilClose <= 90) {
     return 'warning'
   }
 
-  return 'normal'
+  return 'safe'
 }
 
 export function hydrateDeposit(deposit: Deposit, today = new Date()): Deposit {
@@ -124,12 +130,8 @@ export function buildSummary(deposits: Deposit[]) {
       acc.totalAmountRub += deposit.amountRub
       acc.totalIncomeRub += deposit.expectedIncomeRub
 
-      if (deposit.status === 'warning') {
-        acc.warningCount += 1
-      }
-
-      if (deposit.status === 'critical') {
-        acc.criticalCount += 1
+      if (deposit.status === 'urgent') {
+        acc.soonCount += 1
       }
 
       return acc
@@ -138,8 +140,7 @@ export function buildSummary(deposits: Deposit[]) {
       count: 0,
       totalAmountRub: 0,
       totalIncomeRub: 0,
-      warningCount: 0,
-      criticalCount: 0,
+      soonCount: 0,
     },
   )
 }
@@ -181,27 +182,27 @@ export function formatPercent(value: number) {
 
 export function getStatusLabel(status: DepositStatus) {
   switch (status) {
-    case 'critical':
-      return 'Закрывается скоро'
+    case 'urgent':
+      return 'До 30 дней'
     case 'warning':
-      return 'Срок подходит'
+      return '31-90 дней'
     case 'closed':
       return 'Закрыт'
     default:
-      return 'Активен'
+      return '90+ дней'
   }
 }
 
 export function getStatusTone(status: DepositStatus) {
   switch (status) {
-    case 'critical':
-      return 'status-critical'
+    case 'urgent':
+      return 'status-urgent'
     case 'warning':
       return 'status-warning'
     case 'closed':
       return 'status-closed'
     default:
-      return 'status-normal'
+      return 'status-safe'
   }
 }
 
@@ -216,36 +217,60 @@ export function getStatusMessage(closeDate: string, today = new Date()) {
     return 'Закрывается сегодня'
   }
 
-  if (daysUntilClose === 1) {
-    return 'Закрывается через 1 день'
-  }
-
-  return `Закрывается через ${daysUntilClose} дн.`
+  return `Закрывается через ${formatDaysLabel(daysUntilClose)}`
 }
 
 export function createDemoDeposits(today = new Date()): Deposit[] {
   const base = startOfDay(today)
   const drafts: DepositDraft[] = [
     {
-      bankName: 'Т-Банк',
-      ratePercent: '17.4',
+      bankName: 'Сбер',
+      ratePercent: '13.8',
       openDate: formatDateInput(shiftDays(base, -25)),
-      closeDate: formatDateInput(shiftDays(base, 120)),
-      amountRub: '500000',
+      closeDate: formatDateInput(shiftDays(base, 12)),
+      amountRub: '264000',
     },
     {
-      bankName: 'Альфа-Банк',
-      ratePercent: '18.2',
-      openDate: formatDateInput(shiftDays(base, -130)),
-      closeDate: formatDateInput(shiftDays(base, 21)),
+      bankName: 'Озон ЦФА',
+      ratePercent: '17',
+      openDate: formatDateInput(shiftDays(base, -48)),
+      closeDate: formatDateInput(shiftDays(base, 28)),
+      amountRub: '120000',
+    },
+    {
+      bankName: 'Финуслуги',
+      ratePercent: '25',
+      openDate: formatDateInput(shiftDays(base, -61)),
+      closeDate: formatDateInput(shiftDays(base, 45)),
       amountRub: '350000',
     },
     {
       bankName: 'Сбер',
-      ratePercent: '16.9',
-      openDate: formatDateInput(shiftDays(base, -300)),
-      closeDate: formatDateInput(shiftDays(base, 5)),
-      amountRub: '900000',
+      ratePercent: '13.8',
+      openDate: formatDateInput(shiftDays(base, -20)),
+      closeDate: formatDateInput(shiftDays(base, 98)),
+      amountRub: '264000',
+    },
+    {
+      bankName: 'Озон ЦФА',
+      ratePercent: '17',
+      openDate: formatDateInput(shiftDays(base, -60)),
+      closeDate: formatDateInput(shiftDays(base, 122)),
+      amountRub: '405000',
+    },
+    {
+      bankName: 'Озон ЦФА',
+      ratePercent: '17.2',
+      openDate: formatDateInput(shiftDays(base, -30)),
+      closeDate: formatDateInput(shiftDays(base, 137)),
+      amountRub: '120000',
+    },
+    {
+      bankName: 'Т-Банк',
+      ratePercent: '14',
+      openDate: formatDateInput(shiftDays(base, -9)),
+      closeDate: formatDateInput(shiftDays(base, 174)),
+      amountRub: '350000',
     },
     {
       bankName: 'ВТБ',
@@ -257,6 +282,34 @@ export function createDemoDeposits(today = new Date()): Deposit[] {
   ]
 
   return drafts.map((draft) => createDepositFromDraft(draft, undefined, today))
+}
+
+export function formatShortDate(date: string) {
+  return shortDateFormatter.format(new Date(`${date}T00:00:00`))
+}
+
+export function formatLongDate(date: string) {
+  return longDateFormatter.format(new Date(`${date}T00:00:00`))
+}
+
+export function getClosestClosingDeposits(deposits: Deposit[], limit = 5) {
+  return sortActiveDeposits(deposits.filter((deposit) => deposit.status !== 'closed')).slice(0, limit)
+}
+
+export function formatDaysLabel(value: number) {
+  const abs = Math.abs(value)
+  const mod10 = abs % 10
+  const mod100 = abs % 100
+
+  if (mod10 === 1 && mod100 !== 11) {
+    return `${value} день`
+  }
+
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${value} дня`
+  }
+
+  return `${value} дней`
 }
 
 function safeId() {
