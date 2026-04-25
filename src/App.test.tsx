@@ -150,7 +150,8 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText('Сумма вклада, ₽'), { target: { value: '800000' } })
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить вклад' }))
 
-    const createdCard = screen.getByRole('heading', { name: 'Газпромбанк' }).closest('button')
+    const activeGrid = screen.getByTestId('active-grid')
+    const createdCard = within(activeGrid).getByRole('heading', { name: 'Газпромбанк' }).closest('button')
     expect(createdCard).not.toBeNull()
     fireEvent.click(createdCard!)
 
@@ -158,14 +159,14 @@ describe('App', () => {
     fireEvent.change(bankNameInput, { target: { value: 'Газпромбанк Премиум' } })
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить изменения' }))
 
-    expect(screen.getByRole('heading', { name: 'Газпромбанк Премиум' })).toBeInTheDocument()
+    expect(within(activeGrid).getByRole('heading', { name: 'Газпромбанк Премиум' })).toBeInTheDocument()
 
-    const editedCard = screen.getByRole('heading', { name: 'Газпромбанк Премиум' }).closest('button')
+    const editedCard = within(activeGrid).getByRole('heading', { name: 'Газпромбанк Премиум' }).closest('button')
     expect(editedCard).not.toBeNull()
     fireEvent.click(editedCard!)
     fireEvent.click(screen.getByRole('button', { name: 'Удалить вклад' }))
 
-    expect(screen.queryByRole('heading', { name: 'Газпромбанк Премиум' })).not.toBeInTheDocument()
+    expect(within(activeGrid).queryByRole('heading', { name: 'Газпромбанк Премиум' })).not.toBeInTheDocument()
 
     const stored = getStoredDeposits()
     expect(stored.hasSeededDemoData).toBe(true)

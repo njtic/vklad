@@ -1,5 +1,6 @@
 import {
   calculateExpectedIncomeRub,
+  createDemoDeposits,
   getClosestClosingDeposits,
   getDepositStatus,
   getDaysUntilClose,
@@ -61,5 +62,13 @@ describe('deposit helpers', () => {
       '2026-06-12',
       '2026-07-05',
     ])
+  })
+
+  it('keeps demo data small and covers urgent and safe statuses', () => {
+    const today = new Date('2026-04-23T10:00:00')
+    const demoDeposits = createDemoDeposits(today)
+
+    expect(demoDeposits).toHaveLength(2)
+    expect(demoDeposits.map((deposit) => deposit.status)).toEqual(['urgent', 'safe'])
   })
 })

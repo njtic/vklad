@@ -224,60 +224,18 @@ export function createDemoDeposits(today = new Date()): Deposit[] {
   const base = startOfDay(today)
   const drafts: DepositDraft[] = [
     {
-      bankName: 'Сбер',
+      bankName: 'Банк Скоро',
       ratePercent: '13.8',
       openDate: formatDateInput(shiftDays(base, -25)),
       closeDate: formatDateInput(shiftDays(base, 12)),
       amountRub: '264000',
     },
     {
-      bankName: 'Озон ЦФА',
-      ratePercent: '17',
-      openDate: formatDateInput(shiftDays(base, -48)),
-      closeDate: formatDateInput(shiftDays(base, 28)),
-      amountRub: '120000',
-    },
-    {
-      bankName: 'Финуслуги',
-      ratePercent: '25',
-      openDate: formatDateInput(shiftDays(base, -61)),
-      closeDate: formatDateInput(shiftDays(base, 45)),
-      amountRub: '350000',
-    },
-    {
-      bankName: 'Сбер',
-      ratePercent: '13.8',
-      openDate: formatDateInput(shiftDays(base, -20)),
-      closeDate: formatDateInput(shiftDays(base, 98)),
-      amountRub: '264000',
-    },
-    {
-      bankName: 'Озон ЦФА',
+      bankName: 'Банк Надолго',
       ratePercent: '17',
       openDate: formatDateInput(shiftDays(base, -60)),
       closeDate: formatDateInput(shiftDays(base, 122)),
       amountRub: '405000',
-    },
-    {
-      bankName: 'Озон ЦФА',
-      ratePercent: '17.2',
-      openDate: formatDateInput(shiftDays(base, -30)),
-      closeDate: formatDateInput(shiftDays(base, 137)),
-      amountRub: '120000',
-    },
-    {
-      bankName: 'Т-Банк',
-      ratePercent: '14',
-      openDate: formatDateInput(shiftDays(base, -9)),
-      closeDate: formatDateInput(shiftDays(base, 174)),
-      amountRub: '350000',
-    },
-    {
-      bankName: 'ВТБ',
-      ratePercent: '15.7',
-      openDate: formatDateInput(shiftDays(base, -420)),
-      closeDate: formatDateInput(shiftDays(base, -14)),
-      amountRub: '420000',
     },
   ]
 
