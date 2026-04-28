@@ -16,7 +16,7 @@ import {
   sortActiveDeposits,
   sortArchivedDeposits,
 } from './lib/deposits'
-import { loadDeposits, persistDeposits } from './lib/storage'
+import { hasDesktopStorage, loadDeposits, loadRuntimeDeposits, persistDeposits } from './lib/storage'
 import type { Deposit, DepositDraft } from './types'
 
 type ModalState =
@@ -26,14 +26,40 @@ type ModalState =
 
 function App() {
   const [deposits, setDeposits] = useState<Deposit[]>(() => loadDeposits())
+  const [storageReady, setStorageReady] = useState(() => !hasDesktopStorage())
   const [modalState, setModalState] = useState<ModalState>(null)
   const [draft, setDraft] = useState<DepositDraft>(makeEmptyDraft())
   const [error, setError] = useState('')
   const [archiveOpen, setArchiveOpen] = useState(false)
 
   useEffect(() => {
+    if (!hasDesktopStorage()) {
+      return
+    }
+
+    let isMounted = true
+
+    void loadRuntimeDeposits().then((loadedDeposits) => {
+      if (!isMounted) {
+        return
+      }
+
+      setDeposits(loadedDeposits)
+      setStorageReady(true)
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!storageReady) {
+      return
+    }
+
     persistDeposits(deposits)
-  }, [deposits])
+  }, [deposits, storageReady])
 
   const normalizedDeposits = deposits.map((deposit) => hydrateDeposit(deposit))
   const activeDeposits = sortActiveDeposits(

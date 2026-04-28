@@ -8,8 +8,21 @@ type PersistedState = {
   deposits: Deposit[]
 }
 
+export function hasDesktopStorage() {
+  return typeof window !== 'undefined' && typeof window.vkladStorage !== 'undefined'
+}
+
 function canUseStorage() {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+}
+
+function isPersistedState(value: unknown): value is PersistedState {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const state = value as PersistedState
+  return Array.isArray(state.deposits) && typeof state.hasSeededDemoData === 'boolean'
 }
 
 function parseState(raw: string | null): PersistedState | null {
@@ -18,17 +31,18 @@ function parseState(raw: string | null): PersistedState | null {
   }
 
   try {
-    const parsed = JSON.parse(raw) as PersistedState
-    if (!Array.isArray(parsed.deposits) || typeof parsed.hasSeededDemoData !== 'boolean') {
-      return null
-    }
-    return parsed
+    const parsed = JSON.parse(raw) as unknown
+    return isPersistedState(parsed) ? parsed : null
   } catch {
     return null
   }
 }
 
 export function loadDeposits(today = new Date()) {
+  if (hasDesktopStorage()) {
+    return []
+  }
+
   if (!canUseStorage()) {
     return createDemoDeposits(today)
   }
@@ -45,10 +59,31 @@ export function loadDeposits(today = new Date()) {
 }
 
 export function persistDeposits(deposits: Deposit[]) {
-  persistState({ hasSeededDemoData: true, deposits })
+  void persistState({ hasSeededDemoData: true, deposits })
 }
 
-function persistState(state: PersistedState) {
+export async function loadRuntimeDeposits(today = new Date()) {
+  if (!hasDesktopStorage()) {
+    return loadDeposits(today)
+  }
+
+  const state = await window.vkladStorage?.load()
+
+  if (!isPersistedState(state) || !state.hasSeededDemoData) {
+    const seeded = createDemoDeposits(today)
+    await persistState({ hasSeededDemoData: true, deposits: seeded })
+    return seeded
+  }
+
+  return state.deposits.map((deposit) => hydrateDeposit(deposit, today))
+}
+
+async function persistState(state: PersistedState) {
+  if (hasDesktopStorage()) {
+    await window.vkladStorage?.save(state)
+    return
+  }
+
   if (!canUseStorage()) {
     return
   }
