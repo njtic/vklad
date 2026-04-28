@@ -55,9 +55,31 @@ npm run desktop:pack
 npm run desktop:build
 ```
 
+Собрать установщик только для текущей платформы можно отдельными командами:
+
+```bash
+npm run desktop:build:mac
+npm run desktop:build:win
+```
+
 Результат сборки появится в папке `release/`. Для macOS собирается `.dmg`, для Windows настроен NSIS-установщик. Обычно macOS-установщик нужно собирать на Mac, а Windows-установщик удобнее собирать на Windows или в CI.
 
 Обновление приложения можно делать вручную: пользователь скачивает новую версию установщика и устанавливает поверх старой. Его файл `deposits.json` остаётся в системной папке приложения.
+
+## Сборка Windows `.exe` без Windows-компьютера
+
+В проект добавлен GitHub Actions workflow `Build Desktop Installers`. Он собирает установщики в облаке: Windows `.exe` на GitHub runner с Windows и macOS `.dmg` на GitHub runner с macOS.
+
+Как получить Windows `.exe`:
+
+1. Запушьте проект в GitHub-репозиторий.
+2. Откройте вкладку `Actions`.
+3. Выберите workflow `Build Desktop Installers`.
+4. Нажмите `Run workflow`.
+5. Дождитесь завершения job `Build Windows installer`.
+6. Внизу страницы запуска скачайте artifact `vklad-tracker-windows`.
+
+Внутри artifact будет готовый `.exe`-установщик. Его можно передавать пользователям Windows; исходный код, IDE и терминал им не нужны.
 
 ## Публикация на GitHub Pages
 
