@@ -32,13 +32,12 @@ export function DepositModal({
       : 0
 
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+    <div className="modal-backdrop" role="presentation">
       <div
         className="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="deposit-modal-title"
-        onClick={(event) => event.stopPropagation()}
       >
         <div className="modal__header">
           <div>

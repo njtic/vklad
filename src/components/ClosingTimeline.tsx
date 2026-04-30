@@ -2,7 +2,7 @@ import type { Deposit } from '../types'
 import {
   formatCurrency,
   formatDaysLabel,
-  formatLongDate,
+  formatTimelineDate,
   getDaysUntilClose,
   getStatusTone,
 } from '../lib/deposits'
@@ -47,7 +47,7 @@ export function ClosingTimeline({ deposits }: ClosingTimelineProps) {
               </div>
               <div className={`timeline__dot ${getStatusTone(deposit.status)}`} aria-hidden="true" />
               <time className="timeline__date" dateTime={deposit.closeDate}>
-                {formatLongDate(deposit.closeDate)}
+                {formatTimelineDate(deposit.closeDate)}
               </time>
             </article>
           )

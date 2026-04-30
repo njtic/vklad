@@ -7,6 +7,10 @@ const longDateFormatter = new Intl.DateTimeFormat('ru-RU', {
   month: 'long',
   year: 'numeric',
 })
+const timelineDateFormatter = new Intl.DateTimeFormat('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+})
 
 function startOfDay(input: string | Date) {
   const date = typeof input === 'string' ? new Date(`${input}T00:00:00`) : input
@@ -248,6 +252,10 @@ export function formatShortDate(date: string) {
 
 export function formatLongDate(date: string) {
   return longDateFormatter.format(new Date(`${date}T00:00:00`))
+}
+
+export function formatTimelineDate(date: string) {
+  return timelineDateFormatter.format(new Date(`${date}T00:00:00`))
 }
 
 export function getClosestClosingDeposits(deposits: Deposit[], limit = 5) {

@@ -1,8 +1,9 @@
 :root {
-  font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+  font-family: "Source Sans 3 Variable", "Noto Sans", "Segoe UI", Arial, sans-serif;
   color: #111827;
   background: #f8fafc;
   font-synthesis: none;
+  font-variant-numeric: tabular-nums;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -137,17 +138,18 @@ button {
 .summary-panel__card {
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 22px;
+  gap: 18px;
+  min-width: 0;
+  padding: 18px;
 }
 
 .summary-panel__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 68px;
-  height: 68px;
-  border-radius: 18px;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
   color: var(--green);
   background: var(--green-soft);
   flex: none;
@@ -159,22 +161,29 @@ button {
 }
 
 .summary-panel__icon svg {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
+}
+
+.summary-panel__copy {
+  min-width: 0;
 }
 
 .summary-panel__card strong {
   display: block;
-  margin-bottom: 8px;
+  max-width: 100%;
+  margin-bottom: 6px;
   color: var(--text);
-  font-size: clamp(1.8rem, 2.8vw, 2.2rem);
-  font-weight: 800;
-  line-height: 1;
+  font-size: clamp(1.35rem, 1.75vw, 1.72rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
 }
 
 .summary-panel__card span:last-child {
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 
 .timeline-card,
@@ -229,12 +238,13 @@ button {
   width: 72px;
   height: 72px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 600;
   flex: none;
 }
 
 .timeline__circle strong {
-  font-size: 2rem;
+  font-size: 1.72rem;
+  font-weight: 650;
   line-height: 1;
 }
 
@@ -265,7 +275,9 @@ button {
 }
 
 .timeline__date {
-  font-size: 0.98rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .section-header {
@@ -339,8 +351,13 @@ button {
 .deposit-card__topline h3 {
   margin: 0;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 800;
+  line-height: 1.15;
+}
+
+.deposit-grid .deposit-card__topline h3 {
+  font-size: 1.28rem;
 }
 
 .deposit-card__dot {
@@ -359,8 +376,9 @@ button {
   display: block;
   margin-top: 6px;
   color: var(--text);
-  font-size: 1.2rem;
+  font-size: 1.36rem;
   font-weight: 800;
+  line-height: 1.08;
 }
 
 .deposit-card__details,

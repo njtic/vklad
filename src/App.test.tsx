@@ -183,6 +183,15 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Добавить вклад' })).toBeInTheDocument()
   })
 
+  it('keeps the modal open when clicking outside it', () => {
+    const { container } = render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить вклад' }))
+    fireEvent.click(container.querySelector('.modal-backdrop')!)
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
   it('does not inject demo data when seeded state already exists', () => {
     persistState([
       {
