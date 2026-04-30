@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { AddDepositTile } from './components/AddDepositTile'
+import { CalendarPanel } from './components/CalendarPanel'
 import { ClosingTimeline } from './components/ClosingTimeline'
 import { DepositCard } from './components/DepositCard'
 import { DepositModal } from './components/DepositModal'
@@ -156,7 +157,10 @@ function App() {
 
         <SummaryPanel {...summary} />
 
-        <ClosingTimeline deposits={closestClosingDeposits} />
+        <div className="overview-grid">
+          <CalendarPanel deposits={normalizedDeposits} />
+          <ClosingTimeline deposits={closestClosingDeposits} />
+        </div>
 
         <section className="content-card">
           <div className="section-header">

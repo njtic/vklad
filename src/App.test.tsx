@@ -109,6 +109,12 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'Календарь вкладов' })).toBeInTheDocument()
     const summary = screen.getByLabelText('Сводка по активным вкладам')
+    expect(within(summary).getAllByText(/общая сумма|ожидаемый доход|вкладов|скоро закончатся/).map((node) => node.textContent)).toEqual([
+      'общая сумма',
+      'ожидаемый доход',
+      'вкладов',
+      'скоро закончатся',
+    ])
     expect(within(summary).getByText('вкладов').previousSibling).toHaveTextContent('5')
     expect(within(summary).getByText('скоро закончатся').previousSibling).toHaveTextContent('2')
 
@@ -120,6 +126,20 @@ describe('App', () => {
       'Т-Банк',
       'Альфа-Банк',
     ])
+
+    const calendar = screen.getByLabelText('Календарь закрытий вкладов')
+    expect(within(calendar).getByText(/апрель 2026/i)).toBeInTheDocument()
+    const vtbDay = within(calendar).getByRole('button', { name: /ВТБ/ })
+    expect(vtbDay).toHaveTextContent('20')
+    expect(within(vtbDay).getByText('ВТБ')).toBeInTheDocument()
+    expect(within(vtbDay).getByText('420 000 ₽')).toBeInTheDocument()
+    fireEvent.click(vtbDay)
+    expect(vtbDay).toHaveClass('calendar-day--active')
+    fireEvent.click(screen.getByRole('heading', { name: 'Календарь вкладов' }))
+    expect(vtbDay).not.toHaveClass('calendar-day--active')
+    fireEvent.click(within(calendar).getByRole('button', { name: 'Следующий месяц' }))
+    expect(within(calendar).getByText(/май 2026/i)).toBeInTheDocument()
+    expect(within(calendar).getByRole('button', { name: /Сбер/ })).toHaveTextContent('1')
 
     const activeGrid = screen.getByTestId('active-grid')
     expect(within(activeGrid).getAllByRole('heading', { level: 3 }).map((node) => node.textContent)).toEqual([

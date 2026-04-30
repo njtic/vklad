@@ -26,9 +26,9 @@ function SummaryIcon({ type }: { type: 'portfolio' | 'money' | 'income' | 'clock
 
 export function SummaryPanel({ count, totalAmountRub, totalIncomeRub, soonCount }: SummaryPanelProps) {
   const metrics = [
-    { icon: 'portfolio' as const, value: String(count), label: 'вкладов', tone: 'neutral' },
     { icon: 'money' as const, value: formatCurrency(totalAmountRub), label: 'общая сумма', tone: 'neutral' },
     { icon: 'income' as const, value: formatCurrency(totalIncomeRub), label: 'ожидаемый доход', tone: 'neutral' },
+    { icon: 'portfolio' as const, value: String(count), label: 'вкладов', tone: 'neutral' },
     { icon: 'clock' as const, value: String(soonCount), label: 'скоро закончатся', tone: 'alert' },
   ]
 

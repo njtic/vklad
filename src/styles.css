@@ -69,6 +69,7 @@ button {
 }
 
 .page-header h1,
+.calendar-card h2,
 .timeline-card h2,
 .section-header h2 {
   margin: 0;
@@ -78,6 +79,7 @@ button {
   letter-spacing: -0.03em;
 }
 
+.calendar-card h2,
 .timeline-card h2,
 .section-header h2 {
   font-size: 1.9rem;
@@ -127,6 +129,7 @@ button {
 }
 
 .summary-panel__card,
+.calendar-card,
 .timeline-card,
 .content-card {
   border: 1px solid var(--line);
@@ -186,13 +189,173 @@ button {
   font-size: 0.98rem;
 }
 
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+
+.calendar-card,
 .timeline-card,
 .content-card {
   padding: 18px 22px 20px;
 }
 
+.calendar-card,
 .timeline-card {
-  margin-bottom: 8px;
+  min-height: 210px;
+}
+
+.timeline-card {
+  grid-column: span 3;
+}
+
+.calendar-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.calendar-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calendar-card__controls {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.calendar-card__nav {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--text);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.calendar-card__nav:hover {
+  transform: translateY(-1px);
+  border-color: rgba(23, 147, 77, 0.28);
+  background: var(--green-soft);
+}
+
+.calendar-card__month {
+  margin: 10px 0 10px;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-grid__weekday {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendar-day {
+  position: relative;
+  display: inline-grid;
+  min-width: 0;
+  height: 24px;
+  place-items: center;
+  color: var(--text);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  line-height: 1;
+  border: 0;
+}
+
+.calendar-day--muted {
+  color: #cbd5e1;
+}
+
+.calendar-day--marked {
+  cursor: pointer;
+  color: var(--green);
+  background: var(--green-soft);
+  font-weight: 800;
+  outline: 1px solid currentColor;
+  outline-offset: -1px;
+}
+
+.calendar-day__tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  display: grid;
+  gap: 6px;
+  min-width: 170px;
+  max-width: 240px;
+  padding: 10px 12px;
+  color: var(--text);
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.calendar-day__tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.calendar-day:hover .calendar-day__tooltip,
+.calendar-day:focus-visible .calendar-day__tooltip,
+.calendar-day--active .calendar-day__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.calendar-day__tooltip-row {
+  display: grid;
+  gap: 2px;
+}
+
+.calendar-day__tooltip-row strong {
+  font-size: 0.92rem;
+  line-height: 1.05;
+}
+
+.calendar-day__tooltip-row span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 .timeline-card__empty {
@@ -685,6 +848,14 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timeline-card {
+    grid-column: span 1;
+  }
+
   .timeline {
     overflow-x: auto;
     padding-bottom: 4px;
@@ -727,6 +898,7 @@ button {
   }
 
   .summary-panel,
+  .overview-grid,
   .deposit-grid,
   .archive-grid,
   .deposit-card__details,
