@@ -375,7 +375,7 @@ button {
   position: absolute;
   left: 36px;
   right: 36px;
-  bottom: 38px;
+  top: 129px;
   height: 2px;
   background: var(--line);
 }
@@ -408,12 +408,13 @@ button {
 .timeline__circle strong {
   font-size: 1.72rem;
   font-weight: 650;
-  line-height: 1;
+  line-height: 0.92;
 }
 
 .timeline__circle span {
-  margin-top: 2px;
+  margin-top: 0;
   font-size: 0.92rem;
+  line-height: 1;
 }
 
 .timeline__copy h3 {

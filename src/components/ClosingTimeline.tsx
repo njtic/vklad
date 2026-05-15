@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import type { Deposit } from '../types'
 import {
   formatCurrency,
@@ -11,7 +12,34 @@ type ClosingTimelineProps = {
   deposits: Deposit[]
 }
 
+const COMPACT_TIMELINE_QUERY = '(max-width: 1180px)'
+
 export function ClosingTimeline({ deposits }: ClosingTimelineProps) {
+  const [isCompact, setIsCompact] = useState(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return false
+    }
+
+    return window.matchMedia(COMPACT_TIMELINE_QUERY).matches
+  })
+  const visibleDeposits = deposits.slice(0, isCompact ? 3 : 5)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return
+    }
+
+    const mediaQuery = window.matchMedia(COMPACT_TIMELINE_QUERY)
+    const handleChange = () => setIsCompact(mediaQuery.matches)
+
+    handleChange()
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
+
   if (!deposits.length) {
     return (
       <section className="timeline-card">
@@ -27,10 +55,10 @@ export function ClosingTimeline({ deposits }: ClosingTimelineProps) {
       <div
         className="timeline"
         data-testid="closing-timeline"
-        style={{ gridTemplateColumns: `repeat(${deposits.length}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${visibleDeposits.length}, minmax(0, 1fr))` }}
       >
         <div className="timeline__track" aria-hidden="true" />
-        {deposits.map((deposit) => {
+        {visibleDeposits.map((deposit) => {
           const daysUntilClose = getDaysUntilClose(deposit.closeDate)
 
           return (
