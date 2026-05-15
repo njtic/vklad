@@ -40,6 +40,39 @@ jobs:
             release/latest.yml
           if-no-files-found: error
 
+  build-windows-7-legacy:
+    name: Build Windows 7 legacy 32-bit installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Windows 7 legacy installer
+        run: npm run desktop:build:win7
+
+      - name: Upload Windows 7 legacy installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: vklad-tracker-windows-7-ia32-legacy
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
+          if-no-files-found: error
+
   build-macos:
     name: Build macOS installer
     runs-on: macos-latest
